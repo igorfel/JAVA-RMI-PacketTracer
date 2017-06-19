@@ -21,4 +21,7 @@ public interface RMIInterfaces extends Remote {
     
     public String getPacket()
             throws RemoteException;
+    
+    public int subscribe2watchPackets()
+            throws RemoteException;
 }

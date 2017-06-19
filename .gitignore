@@ -6,3 +6,6 @@
 /RMIServer/build/
 /RMIClient/build/
 /RMIClient/dist/
+/JnetPcap/nbproject/private/
+/JnetPcap/build/
+/JnetPcap/dist/

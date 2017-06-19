@@ -26,6 +26,9 @@ public class MainMenu extends javax.swing.JFrame {
         initComponents();
         
         clientCon = new RMIClient();
+        /*while(true){
+            lblPackets.setText(Integer.toString(clientCon.getPackets()));
+        }*/
     }
 
     /**
@@ -43,6 +46,8 @@ public class MainMenu extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtData = new javax.swing.JTextArea();
         btnRequest = new javax.swing.JButton();
+        lblPackets = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -67,6 +72,10 @@ public class MainMenu extends javax.swing.JFrame {
             }
         });
 
+        lblPackets.setText("0");
+
+        jLabel2.setText("Packets:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -79,16 +88,23 @@ public class MainMenu extends javax.swing.JFrame {
                         .addComponent(btnConnect)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRequest)
-                        .addGap(0, 210, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 157, Short.MAX_VALUE)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblPackets)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnConnect)
-                    .addComponent(btnRequest))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnConnect)
+                        .addComponent(btnRequest))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblPackets)
+                        .addComponent(jLabel2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
                 .addContainerGap())
@@ -133,16 +149,17 @@ public class MainMenu extends javax.swing.JFrame {
         try {
             clientCon.connect2Server();
             btnRequest.setEnabled(true);
+            serverPacketsListener();
         } catch (RemoteException | NotBoundException ex) {
             Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnConnectActionPerformed
 
     private void btnRequestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRequestActionPerformed
-        startServerRoutine();
+        startTestConnection();
     }//GEN-LAST:event_btnRequestActionPerformed
     
-    void startServerRoutine(){
+    void startTestConnection(){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -150,11 +167,28 @@ public class MainMenu extends javax.swing.JFrame {
                     for (int i = 0; i < 10; i++) {
                         String msg = clientCon.getRMIMessage();
                         txtData.append(msg + ":" + i + "\n");
+                        
                         sleep(300);
                     }
 
                 } catch (RemoteException | InterruptedException ex) {
                     Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();
+    }
+    
+    public void serverPacketsListener () throws RemoteException{
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    try {
+                        lblPackets.setText(Integer.toString(clientCon.getCurrentServerPackets()));
+                        sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(RMIClient.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }).start();
@@ -198,10 +232,12 @@ public class MainMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnRequest;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblPackets;
     private javax.swing.JTextArea txtData;
     // End of variables declaration//GEN-END:variables
 }
